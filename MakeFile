@@ -1,0 +1,50 @@
+# ============================================================
+#  Game of Life — Makefile (Windows GDI, no external libs)
+# ============================================================
+
+CXX      := g++
+CXXFLAGS := -std=c++17 -Wall -Wextra -O2
+
+# Windows GDI — always available, no install needed
+LIBS     := -lgdi32 -mwindows
+
+SRC_DIR  := src
+OBJ_DIR  := obj
+BIN_DIR  := bin
+TARGET   := $(BIN_DIR)/game_of_life.exe
+
+SRCS     := $(wildcard $(SRC_DIR)/*.cpp)
+OBJS     := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+
+# ============================================================
+all: dirs $(TARGET)
+
+build: all
+
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LIBS)
+	@echo.
+	@echo   Build successful! -^> $(TARGET)
+	@echo.
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+dirs:
+	@if not exist $(OBJ_DIR) mkdir $(OBJ_DIR)
+	@if not exist $(BIN_DIR) mkdir $(BIN_DIR)
+
+# ============================================================
+debug: CXXFLAGS := -std=c++17 -Wall -Wextra -g -DDEBUG
+debug: LIBS     := -lgdi32
+debug: all
+
+run: all
+	$(TARGET)
+
+clean:
+	@if exist $(OBJ_DIR) rmdir /S /Q $(OBJ_DIR)
+	@if exist $(BIN_DIR) rmdir /S /Q $(BIN_DIR)
+	@echo Cleaned.
+
+.PHONY: all build debug run clean dirs
